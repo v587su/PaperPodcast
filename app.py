@@ -2,7 +2,13 @@ import os
 from flask import Flask, request, jsonify
 import sys
 
-from server.config_util import get_podcast_config
+from server.config_util import get_podcast_config, get_gemini_api_key, get_openai_api_key
+
+# 设置 GEMINI_API_KEY 环境变量
+os.environ["GEMINI_API_KEY"] = get_gemini_api_key() or ""
+
+# 设置 OPENAI_API_KEY 环境变量
+os.environ["OPENAI_API_KEY"] = get_openai_api_key() or ""
 
 app = Flask(__name__)
 podcast_cfg = get_podcast_config()
