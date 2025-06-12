@@ -2,8 +2,11 @@ import os
 from flask import Flask, request, jsonify
 import sys
 
+from server.config_util import get_podcast_config
+
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = './uploads' # 设置上传文件保存目录
+podcast_cfg = get_podcast_config()
+app.config['UPLOAD_FOLDER'] = podcast_cfg['upload_folder']  # 统一用配置文件
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True) # 创建上传目录
 # 前端页面和静态资源已分离，无需再由 Flask 提供
 
@@ -23,14 +26,12 @@ def frontend_static(filename):
     # 允许通过 /frontend/ 访问前端静态文件
     return send_from_directory('frontend', filename)
 
-from podcastfy.resource import PodcastResource
-
-# 注册 RESTful 路由
-from podcastfy.auth import jwt_required
+from server.controllers.podcast_controller import PodcastController
+from server.auth import jwt_required
 
 app.add_url_rule(
     '/api/v1/podcasts',
-    view_func=PodcastResource.as_view('podcast_resource'),
+    view_func=PodcastController.as_view('podcast_resource'),
     methods=['POST']
 )
 
