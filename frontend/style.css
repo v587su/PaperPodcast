@@ -1,0 +1,114 @@
+body {
+    background: linear-gradient(135deg, #f7f7fa 0%, #e3e6f3 100%);
+    min-height: 100vh;
+}
+.container {
+    max-width: 500px;
+    margin-top: 60px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px #0002;
+    padding: 40px 28px 32px 28px;
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+.container:hover {
+    box-shadow: 0 8px 32px #0003;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 32px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #3a3a5a;
+}
+#logBox {
+    background: #23272f;
+    color: #b6ffb6;
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    min-height: 80px;
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 28px;
+    font-size: 15px;
+    box-shadow: 0 2px 8px #0001;
+    word-break: break-all;
+}
+.form-label {
+    font-weight: 600;
+    color: #4a4a6a;
+}
+.form-control:focus {
+    border-color: #6c63ff;
+    box-shadow: 0 0 0 2px #6c63ff33;
+}
+.btn-primary {
+    width: 100%;
+    background: linear-gradient(90deg, #6c63ff 0%, #48c6ef 100%);
+    border: none;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #6c63ff22;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover, .btn-primary:focus {
+    background: linear-gradient(90deg, #48c6ef 0%, #6c63ff 100%);
+    box-shadow: 0 4px 16px #6c63ff33;
+}
+.lang-switch {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    z-index: 2;
+}
+.lang-switch .btn-link {
+    color: #6c63ff;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: underline;
+    margin-left: 2px;
+    margin-right: 2px;
+    transition: color 0.2s;
+}
+.lang-switch .btn-link:hover {
+    color: #48c6ef;
+    text-decoration: none;
+}
+#fileNamePreview {
+    display: block;
+    margin-top: 8px;
+    color: #888;
+    font-size: 14px;
+    text-align: left;
+}
+.logo {
+    display: block;
+    margin: 0 auto 18px auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px #6c63ff33;
+    background: linear-gradient(135deg, #6c63ff 60%, #48c6ef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.logo img {
+    width: 36px;
+    height: 36px;
+    display: block;
+    margin: auto;
+}
+@media (max-width: 600px) {
+    .container {
+        max-width: 98vw;
+        margin-top: 24px;
+        padding: 18px 4vw 18px 4vw;
+    }
+    .lang-switch {
+        top: 12px;
+        right: 10px;
+    }
+}

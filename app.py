@@ -30,7 +30,7 @@ from podcastfy.auth import jwt_required
 
 app.add_url_rule(
     '/api/v1/podcasts',
-    view_func=PodcastResource.as_view('podcast_resource', decorators=[jwt_required]),
+    view_func=PodcastResource.as_view('podcast_resource'),
     methods=['POST']
 )
 

@@ -63,8 +63,10 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData,
             headers: {
-                // 预留JWT认证头部，实际可从本地存储或登录后获取
-                'Authorization': localStorage.getItem('token') ? 'Bearer ' + localStorage.getItem('token') : ''
+                // 开发阶段默认加一个测试token，便于后端流程调试
+                'Authorization': localStorage.getItem('token')
+                    ? 'Bearer ' + localStorage.getItem('token')
+                    : 'Bearer testtoken'
             }
         }).then(response => {
             if (response.status === 201) {
