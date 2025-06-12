@@ -4,3 +4,4 @@ data/
 *.wav
 .venv/
 .DS_Store
+*.pyc
