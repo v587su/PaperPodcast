@@ -1,0 +1,5 @@
+.env
+data/
+*.mp3
+*.wav
+.DS_Store
