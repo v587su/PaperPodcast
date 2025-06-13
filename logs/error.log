@@ -1,0 +1,195 @@
+[2025-06-13 22:30:34 +0800] [81350] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['127.0.0.1:8082']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 300
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/sunzhensu/Documents/PaperPodcast
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 502
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: logs/access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: logs/error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  statsd_prefix: 
+  proc_name: paper_podcast
+  default_proc_name: app:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x107642ac0>
+  on_reload: <function OnReload.on_reload at 0x107642c00>
+  when_ready: <function WhenReady.when_ready at 0x107642d40>
+  pre_fork: <function Prefork.pre_fork at 0x107642e80>
+  post_fork: <function Postfork.post_fork at 0x107642fc0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x107643100>
+  worker_int: <function WorkerInt.worker_int at 0x107643240>
+  worker_abort: <function WorkerAbort.worker_abort at 0x107643380>
+  pre_exec: <function PreExec.pre_exec at 0x1076434c0>
+  pre_request: <function PreRequest.pre_request at 0x107643600>
+  post_request: <function PostRequest.post_request at 0x1076436a0>
+  child_exit: <function ChildExit.child_exit at 0x1076437e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x107643920>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x107643a60>
+  on_exit: <function OnExit.on_exit at 0x107643ba0>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: TLSv1
+  raw_paste_global_conf: []
+[2025-06-13 22:30:34 +0800] [81350] [INFO] Starting gunicorn 19.9.0
+[2025-06-13 22:30:34 +0800] [81350] [DEBUG] Arbiter booted
+[2025-06-13 22:30:34 +0800] [81350] [INFO] Listening at: http://127.0.0.1:8082 (81350)
+[2025-06-13 22:30:34 +0800] [81350] [INFO] Using worker: sync
+[2025-06-13 22:30:34 +0800] [81371] [INFO] Booting worker with pid: 81371
+[2025-06-13 22:30:34 +0800] [81371] [DEBUG] worker: SIGWINCH ignored.
+[2025-06-13 22:30:34 +0800] [81350] [DEBUG] 1 workers
+[2025-06-13 22:30:34 +0800] [81350] [INFO] Handling signal: winch
+[2025-06-13 22:30:34 +0800] [81350] [DEBUG] SIGWINCH ignored. Not daemonized
+[2025-06-13 22:30:37 +0800] [81350] [INFO] Handling signal: winch
+[2025-06-13 22:30:37 +0800] [81350] [DEBUG] SIGWINCH ignored. Not daemonized
+[2025-06-13 22:30:37 +0800] [81371] [DEBUG] worker: SIGWINCH ignored.
+[2025-06-13 22:30:40 +0800] [81350] [INFO] Handling signal: winch
+[2025-06-13 22:30:40 +0800] [81350] [DEBUG] SIGWINCH ignored. Not daemonized
+[2025-06-13 22:30:40 +0800] [81371] [DEBUG] worker: SIGWINCH ignored.
+[2025-06-13 22:30:44 +0800] [81371] [DEBUG] GET /
+[2025-06-13 22:30:44 +0800] [81371] [DEBUG] GET /frontend/index.html
+[2025-06-13 22:30:44 +0800] [81371] [DEBUG] GET /frontend/style.css
+[2025-06-13 22:30:44 +0800] [81371] [DEBUG] GET /frontend/upload.js
+[2025-06-13 22:30:50 +0800] [81350] [INFO] Handling signal: int
+[2025-06-13 22:30:51 +0800] [81371] [INFO] Worker exiting (pid: 81371)
+[2025-06-13 22:30:51 +0800] [81350] [INFO] Shutting down: Master
+[2025-06-13 22:33:07 +0800] [83078] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  bind: ['127.0.0.1:8082']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 300
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /Users/sunzhensu/Documents/PaperPodcast
+  daemon: True
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 502
+  group: 20
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1']
+  accesslog: logs/access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: logs/error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  syslog_addr: unix:///var/run/syslog
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  statsd_prefix: 
+  proc_name: paper_podcast
+  default_proc_name: app:app
+  pythonpath: None
+  paste: None
+  on_starting: <function OnStarting.on_starting at 0x107e76ac0>
+  on_reload: <function OnReload.on_reload at 0x107e76c00>
+  when_ready: <function WhenReady.when_ready at 0x107e76d40>
+  pre_fork: <function Prefork.pre_fork at 0x107e76e80>
+  post_fork: <function Postfork.post_fork at 0x107e76fc0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x107e77100>
+  worker_int: <function WorkerInt.worker_int at 0x107e77240>
+  worker_abort: <function WorkerAbort.worker_abort at 0x107e77380>
+  pre_exec: <function PreExec.pre_exec at 0x107e774c0>
+  pre_request: <function PreRequest.pre_request at 0x107e77600>
+  post_request: <function PostRequest.post_request at 0x107e776a0>
+  child_exit: <function ChildExit.child_exit at 0x107e777e0>
+  worker_exit: <function WorkerExit.worker_exit at 0x107e77920>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x107e77a60>
+  on_exit: <function OnExit.on_exit at 0x107e77ba0>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: TLSv1
+  raw_paste_global_conf: []
+[2025-06-13 22:33:07 +0800] [83078] [INFO] Starting gunicorn 19.9.0
+[2025-06-13 22:33:07 +0800] [83078] [DEBUG] Arbiter booted
+[2025-06-13 22:33:07 +0800] [83078] [INFO] Listening at: http://127.0.0.1:8082 (83078)
+[2025-06-13 22:33:07 +0800] [83078] [INFO] Using worker: sync
+[2025-06-13 22:33:07 +0800] [83084] [INFO] Booting worker with pid: 83084
+[2025-06-13 22:33:07 +0800] [83078] [DEBUG] 1 workers
+[2025-06-13 22:33:09 +0800] [83084] [DEBUG] GET /frontend/index.html
+[2025-06-13 22:33:09 +0800] [83084] [DEBUG] GET /frontend/style.css
+[2025-06-13 22:33:09 +0800] [83084] [DEBUG] GET /frontend/upload.js
