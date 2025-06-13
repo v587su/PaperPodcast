@@ -3,12 +3,20 @@ from werkzeug.utils import secure_filename
 from loguru import logger
 import hashlib
 import datetime
+import re
+from flask import current_app
 
 from server.repositories.file_repository import FileRepository
 from podcastfy.client import generate_podcast
 from server.config_util import get_podcast_config
 
 class PodcastService:
+    @staticmethod
+    def _notify_progress(stage, message=None):
+        """发送进度通知"""
+        if hasattr(current_app, 'broadcast_progress'):
+            current_app.broadcast_progress(stage, message)
+
     @staticmethod
     def handle_pdf_upload(file, app_ctx):
         cfg = get_podcast_config()
@@ -26,9 +34,9 @@ class PodcastService:
         file.seek(0, os.SEEK_END)
         file_length = file.tell()
         file.seek(0)
-        if file_length > 10 * 1024 * 1024:
+        if file_length > 50 * 1024 * 1024:
             logger.warning("文件过大: {} bytes", file_length)
-            return {"error": "File too large. Max size is 10MB."}, 400
+            return {"error": "File too large. Max size is 50MB."}, 400
 
         # PDF头校验
         file_head = file.read(5)
@@ -81,10 +89,24 @@ class PodcastService:
             return {"error": f"Error processing PDF: {e}"}, 500
 
     @staticmethod
+    def _get_next_mp3_number(audio_dir):
+        """获取下一个可用的MP3文件编号"""
+        max_num = 0
+        for filename in os.listdir(audio_dir):
+            if filename.endswith('.mp3'):
+                # 使用正则表达式匹配文件名中的数字
+                match = re.match(r'vol(\d+)\.mp3', filename)
+                if match:
+                    num = int(match.group(1))
+                    max_num = max(max_num, num)
+        return max_num + 1
+
+    @staticmethod
     def _generate_mp3(pdf_path, app_ctx):
         cfg = get_podcast_config()
         custom_config = {
-            "podcast_name": "Third Audience Podcast",
+            "podcast_name": "Third Audience",
+            "podcast_tagline": "Where human, machine and AI meet in code",
             "word_count": 4500,
             "conversation_style": ["humorous", "casual", "critical", "expository"],
             "roles": {
@@ -115,9 +137,50 @@ class PodcastService:
             "creativity": 0.3
         }
         llm_model_name = cfg['llm_model_name']
-        output_file_path = generate_podcast(
-            urls=[pdf_path],
-            llm_model_name=llm_model_name,
-            conversation_config=custom_config
-        )
-        return output_file_path
+        
+        # 获取音频目录
+        audio_dir = cfg['mp3_folder']
+        os.makedirs(audio_dir, exist_ok=True)
+        
+        # 生成新的MP3文件名
+        next_num = PodcastService._get_next_mp3_number(audio_dir)
+        output_filename = f"vol{next_num:03d}.mp3"
+        output_file_path = os.path.join(audio_dir, output_filename)
+        
+        try:
+            # 通知开始生成脚本
+            PodcastService._notify_progress('script_start')
+            logger.info("开始生成播客脚本...")
+            
+            # 生成播客
+            generated_path = generate_podcast(
+                urls=[pdf_path],
+                llm_model_name=llm_model_name,
+                conversation_config=custom_config
+            )
+            
+            transcript_path = generated_path.replace('.mp3', '.txt').replace('audio', 'transcripts')
+    
+            
+            # 移动生成的文件到目标位置
+            if os.path.exists(generated_path):
+                os.rename(generated_path, output_file_path)
+                logger.info(f"Renamed {generated_path} to {output_file_path}")
+                
+                # 重命名对应的transcript文件
+                if os.path.exists(transcript_path):
+                    new_transcript_path = output_file_path.replace('.mp3', '.txt')
+                    os.rename(transcript_path, new_transcript_path)
+                    logger.info(f"Renamed transcript {transcript_path} to {new_transcript_path}")
+            else:
+                raise Exception(f"Generated file not found at {generated_path}")
+            
+            # 通知完成
+            PodcastService._notify_progress('complete', "播客生成完成")
+            logger.info("播客生成完成")
+                
+            return output_file_path
+        except Exception as e:
+            logger.error(f"生成播客时出错: {e}")
+            PodcastService._notify_progress('error', str(e))
+            raise
