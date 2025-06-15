@@ -19,6 +19,10 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.srt
+*.mp4
+*.logs
+*.log
 
 # Virtual Environment
 venv/

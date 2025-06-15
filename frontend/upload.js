@@ -1,9 +1,9 @@
 const LANGS = {
     zh: {
         title: "PDF转播客 Demo",
-        select: "选择PDF文件：",
-        upload: "上传并生成播客",
-        choose: "请选择一个PDF文件",
+        select: "选择PDF或MP3文件：",
+        upload: "上传并生成播客/视频",
+        choose: "请选择一个PDF或MP3文件",
         uploading: "正在上传文件...",
         uploaded: "文件上传完成，正在处理...",
         success: "处理成功：",
@@ -12,6 +12,7 @@ const LANGS = {
         neterr: "网络或服务器错误：",
         fail: "请求失败，状态码：",
         download: "下载播客",
+        video_download: "下载视频",
         processing_time: "播客生成通常需要 3-5 分钟",
         progress: {
             script_start: "开始生成播客脚本...",
@@ -23,9 +24,9 @@ const LANGS = {
     },
     en: {
         title: "PDF to Podcast Demo",
-        select: "Select PDF file:",
-        upload: "Upload and Generate Podcast",
-        choose: "Please select a PDF file",
+        select: "Select PDF or MP3 file:",
+        upload: "Upload and Generate Podcast/Video",
+        choose: "Please select a PDF or MP3 file",
         uploading: "Uploading file...",
         uploaded: "File uploaded, processing...",
         success: "Success: ",
@@ -34,6 +35,7 @@ const LANGS = {
         neterr: "Network or server error: ",
         fail: "Request failed, status: ",
         download: "Download Podcast",
+        video_download: "Download Video",
         processing_time: "Podcast generation typically takes 3-5 minutes",
         progress: {
             script_start: "Generating podcast script...",
@@ -93,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('h2').textContent = LANG.title;
     document.querySelector('label[for="pdfFile"]').textContent = LANG.select;
     document.querySelector('.btn-primary').textContent = LANG.upload;
+    document.querySelector('label[for="generateVideoSwitch"]').textContent = getLang() === 'zh' ? '生成视频（可选）' : 'Generate Video (optional)';
 
     // 设置语言切换按钮的点击事件
     document.querySelectorAll('.lang-switch .btn-link').forEach(btn => {
@@ -106,29 +109,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const form = document.getElementById('uploadForm');
     const logBox = document.getElementById('logBox');
+    const fileInput = document.getElementById('pdfFiles');
+    const fileNamePreview = document.getElementById('fileNamePreview');
+
+    // 文件名预览支持多文件
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length) {
+            fileNamePreview.textContent = Array.from(fileInput.files).map(f => f.name).join(', ');
+        } else {
+            fileNamePreview.textContent = '';
+        }
+    });
 
     function connectWebSocket() {
         if (currentState.ws) {
             currentState.ws.close();
         }
-        
         currentState.ws = new WebSocket('ws://127.0.0.1:8088/ws/progress');
-        
         currentState.ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
             if (data.type === 'progress') {
                 updateProgress(data.stage, data.message);
             }
         };
-
         currentState.ws.onclose = function() {
             console.log('WebSocket connection closed');
             if (currentState.isProcessing) {
-                // 如果仍在处理中，尝试重新连接
                 setTimeout(connectWebSocket, 1000);
             }
         };
-
         currentState.ws.onerror = function(error) {
             console.error('WebSocket error:', error);
         };
@@ -137,96 +146,127 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateProgress(stage, message) {
         const progressDiv = document.createElement('div');
         progressDiv.className = 'progress-item';
-        
         const icon = document.createElement('span');
         icon.className = 'progress-icon';
-        
         const text = document.createElement('span');
         text.textContent = message || LANG.progress[stage];
-        
         progressDiv.appendChild(icon);
         progressDiv.appendChild(text);
         logBox.appendChild(progressDiv);
-        
-        // 如果是完成状态，添加complete类
         if (stage === 'complete') {
             progressDiv.classList.add('complete');
             currentState.isProcessing = false;
         }
-        
-        // 滚动到底部
         logBox.scrollTop = logBox.scrollHeight;
     }
 
+    // 批量上传主逻辑
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (currentState.isProcessing) {
-            return; // 如果正在处理中，不响应新的提交
+            return;
         }
-        
         logBox.innerHTML = '';
-        const fileInput = document.getElementById('pdfFile');
         if (!fileInput.files.length) {
             log(LANG.choose);
             return;
         }
-        
         currentState.isProcessing = true;
-        currentState.currentFile = fileInput.files[0];
-        
-        const file = currentState.currentFile;
-        log(LANG.uploading);
-        
-        // 添加处理时间提示
-        const timeHint = document.createElement('div');
-        timeHint.className = 'processing-time-hint';
-        timeHint.textContent = LANG.processing_time;
-        logBox.appendChild(timeHint);
-        
-        // 连接WebSocket
-        connectWebSocket();
-        
-        const formData = new FormData();
-        formData.append('pdfFile', file);
-        fetch('http://127.0.0.1:8088/api/v1/podcasts', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Authorization': localStorage.getItem('token')
-                    ? 'Bearer ' + localStorage.getItem('token')
-                    : 'Bearer testtoken'
+        const files = Array.from(fileInput.files);
+        const generateVideo = document.getElementById('generateVideoSwitch').checked;
+        const paperTitle = document.getElementById('paperTitle').value;
+        const paperPublish = document.getElementById('paperAuthor').value;
+        // 多文件时按逗号分割
+        const paperTitleArr = paperTitle.split(',').map(s => s.trim());
+        const paperPublishArr = paperPublish.split(',').map(s => s.trim());
+        let idx = 0;
+        function uploadNext() {
+            if (idx >= files.length) {
+                currentState.isProcessing = false;
+                log(LANG.success + ' ' + (getLang() === 'zh' ? '全部文件处理完成' : 'All files processed'));
+                return;
             }
-        }).then(response => {
-            if (response.status === 201) {
-                log(LANG.uploaded);
+            const file = files[idx];
+            log((getLang() === 'zh' ? '正在上传：' : 'Uploading: ') + file.name);
+            // 处理时间提示
+            const timeHint = document.createElement('div');
+            timeHint.className = 'processing-time-hint';
+            timeHint.textContent = LANG.processing_time;
+            logBox.appendChild(timeHint);
+            connectWebSocket();
+            const formData = new FormData();
+            if (file.name.toLowerCase().endsWith('.mp3')) {
+                formData.append('mp3File', file);
             } else {
-                log(LANG.fail + response.status);
-                currentState.isProcessing = false;
+                formData.append('pdfFile', file);
             }
-            return response.json();
-        }).then(data => {
-            if (data.message) {
-                log(LANG.success + data.message);
-                if (data.output_path) {
-                    const filename = data.output_path.split('/').pop();
-                    log(LANG.podcast + data.output_path);
-                    // 添加下载按钮
-                    const downloadBtn = document.createElement('button');
-                    downloadBtn.textContent = LANG.download;
-                    downloadBtn.className = 'btn btn-success mt-2';
-                    downloadBtn.onclick = () => {
-                        window.location.href = `http://127.0.0.1:8088/api/v1/podcasts/download/${filename}`;
-                    };
-                    logBox.appendChild(downloadBtn);
+            formData.append('generate_video', generateVideo ? '1' : '0');
+            // 多文件时分别传递对应的标题和发表
+            if (paperTitleArr.length === files.length) {
+                formData.append('paper_title', paperTitleArr[idx]);
+            } else if (paperTitle) {
+                formData.append('paper_title', paperTitle);
+            }
+            if (paperPublishArr.length === files.length) {
+                formData.append('paper_publish', paperPublishArr[idx]);
+            } else if (paperPublish) {
+                formData.append('paper_publish', paperPublish);
+            }
+            fetch('http://127.0.0.1:8088/api/v1/podcasts', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Authorization': localStorage.getItem('token')
+                        ? 'Bearer ' + localStorage.getItem('token')
+                        : 'Bearer testtoken'
                 }
-            } else if (data.error) {
-                log(LANG.error + data.error);
+            }).then(response => {
+                if (response.status === 201) {
+                    log(LANG.uploaded);
+                } else {
+                    log(LANG.fail + response.status);
+                    currentState.isProcessing = false;
+                }
+                return response.json();
+            }).then(data => {
+                // 支持批量返回
+                const results = Array.isArray(data) ? data : [data];
+                results.forEach((item, i) => {
+                    if (item.message) {
+                        log(LANG.success + item.message);
+                        if (item.output_path) {
+                            const filename = item.output_path.split('/').pop();
+                            log(LANG.podcast + item.output_path);
+                            const downloadBtn = document.createElement('button');
+                            downloadBtn.textContent = LANG.download;
+                            downloadBtn.className = 'btn btn-success mt-2';
+                            downloadBtn.onclick = () => {
+                                window.location.href = `http://127.0.0.1:8088/api/v1/podcasts/download/${filename}`;
+                            };
+                            logBox.appendChild(downloadBtn);
+                        }
+                        if (item.video_path) {
+                            const videoFilename = item.video_path.split('/').pop();
+                            const videoBtn = document.createElement('button');
+                            videoBtn.textContent = LANG.video_download || (getLang() === 'zh' ? '下载视频' : 'Download Video');
+                            videoBtn.className = 'btn btn-success mt-2 ms-2';
+                            videoBtn.onclick = () => {
+                                window.location.href = `http://127.0.0.1:8088/api/v1/videos/download/${videoFilename}`;
+                            };
+                            logBox.appendChild(videoBtn);
+                        }
+                    } else if (item.error) {
+                        log(LANG.error + item.error);
+                    }
+                });
+                idx++;
+                uploadNext();
+            }).catch(err => {
+                log(LANG.neterr + err);
                 currentState.isProcessing = false;
-            }
-        }).catch(err => {
-            log(LANG.neterr + err);
-            currentState.isProcessing = false;
-        });
+            });
+        }
+        uploadNext();
     });
 
     function log(msg) {

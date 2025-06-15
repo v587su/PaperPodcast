@@ -6,6 +6,7 @@ import json
 from threading import Lock
 
 from server.config_util import get_podcast_config, get_gemini_api_key, get_openai_api_key
+from server.services.video_service import create_video
 
 # 设置 GEMINI_API_KEY 环境变量
 os.environ["GEMINI_API_KEY"] = get_gemini_api_key() or ""
@@ -77,12 +78,26 @@ def download_podcast(filename):
     mp3_folder = cfg['mp3_folder']
     return send_from_directory(mp3_folder, filename, as_attachment=True)
 
+@app.route('/api/v1/videos/download/<path:filename>')
+def download_video(filename):
+    # 从配置中获取视频文件夹路径
+    cfg = get_podcast_config()
+    video_folder = cfg.get('video_folder', os.path.join(os.path.dirname(cfg['mp3_folder']), 'videos'))
+    return send_from_directory(video_folder, filename, as_attachment=True)
+
 from server.controllers.podcast_controller import PodcastController
+from server.controllers.video_controller import VideoController
 from server.auth import jwt_required
 
 app.add_url_rule(
     '/api/v1/podcasts',
     view_func=PodcastController.as_view('podcast_resource'),
+    methods=['POST']
+)
+
+app.add_url_rule(
+    '/api/v1/videos',
+    view_func=VideoController.as_view('video_resource'),
     methods=['POST']
 )
 

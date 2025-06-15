@@ -18,9 +18,23 @@
         <h2>PDF转播客 Demo</h2>
         <form id="uploadForm" action="#" method="post" enctype="multipart/form-data">
             <div class="mb-3">
-                <label for="pdfFile" class="form-label">选择PDF文件：</label>
-                <input type="file" class="form-control" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                <label for="pdfFiles" class="form-label">选择PDF或MP3文件：</label>
+                <input type="file" class="form-control" id="pdfFiles" name="pdfFiles" accept=".pdf,.mp3" multiple required>
                 <span id="fileNamePreview"></span>
+            </div>
+            <div class="mb-3">
+                <label for="paperTitle" class="form-label">论文标题：</label>
+                <input type="text" class="form-control" id="paperTitle" name="paperTitle" placeholder="可选，自动识别或自定义">
+                <div class="form-text">多个文件时请用英文逗号分隔（如 title1,title2,...）</div>
+            </div>
+            <div class="mb-3">
+                <label for="paperAuthor" class="form-label">发表：</label>
+                <input type="text" class="form-control" id="paperAuthor" name="paperAuthor" placeholder="可选，自动识别或自定义发表信息">
+                <div class="form-text">多个文件时请用英文逗号分隔（如 author1,author2,...）</div>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="generateVideoSwitch" name="generateVideo" checked>
+                <label class="form-check-label" for="generateVideoSwitch">生成视频</label>
             </div>
             <button type="submit" class="btn btn-primary">上传并生成播客</button>
         </form>
@@ -29,7 +43,7 @@
     <script>
         // 文件名预览
         document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('pdfFile');
+            const fileInput = document.getElementById('pdfFiles');
             const fileNamePreview = document.getElementById('fileNamePreview');
             fileInput.addEventListener('change', function() {
                 if (fileInput.files.length) {
